@@ -1,15 +1,18 @@
 // ============================================
-// Floating Circles Animation with Touch Sensitivity
+// Floating Particles Animation with Touch Sensitivity
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
     const circlesContainer = document.getElementById('circlesContainer');
     const circles = [];
-    const numCircles = 15;
+    const numCircles = 50; // More particles
 
-    // Circle properties
-    const minSize = 30;
-    const maxSize = 120;
+    // Smaller particle sizes
+    const minSize = 8;
+    const maxSize = 25;
+
+    // Store particle data for movement
+    const particleData = [];
 
     // Create floating circles
     function createCircles() {
@@ -17,41 +20,82 @@ document.addEventListener('DOMContentLoaded', () => {
             const circle = document.createElement('div');
             circle.classList.add('circle');
 
-            // Random size
+            // Random smaller size
             const size = Math.random() * (maxSize - minSize) + minSize;
             circle.style.width = `${size}px`;
             circle.style.height = `${size}px`;
 
             // Random position
-            const posX = Math.random() * (window.innerWidth - size);
-            const posY = Math.random() * (window.innerHeight - size);
+            const posX = Math.random() * window.innerWidth;
+            const posY = Math.random() * window.innerHeight;
             circle.style.left = `${posX}px`;
             circle.style.top = `${posY}px`;
 
-            // Random animation delay for variety
-            circle.style.animationDelay = `${Math.random() * 5}s`;
-
             // Random opacity for depth effect
-            circle.style.opacity = Math.random() * 0.5 + 0.3;
+            circle.style.opacity = Math.random() * 0.6 + 0.3;
 
-            // Store velocity for movement
-            circle.dataset.vx = (Math.random() - 0.5) * 2;
-            circle.dataset.vy = (Math.random() - 0.5) * 2;
-            circle.dataset.baseX = posX;
-            circle.dataset.baseY = posY;
+            // Store particle movement data
+            particleData.push({
+                element: circle,
+                x: posX,
+                y: posY,
+                size: size,
+                speedX: (Math.random() - 0.5) * 2, // Random horizontal speed
+                speedY: (Math.random() - 0.5) * 2, // Random vertical speed
+                wobbleSpeed: Math.random() * 0.02 + 0.01,
+                wobbleAmount: Math.random() * 30 + 10,
+                angle: Math.random() * Math.PI * 2
+            });
 
             // Add touch/click interaction
-            circle.addEventListener('click', handleCircleTouch);
-            circle.addEventListener('touchstart', handleCircleTouch);
+            circle.addEventListener('click', (e) => handleCircleTouch(e, i));
+            circle.addEventListener('touchstart', (e) => handleCircleTouch(e, i));
 
             circlesContainer.appendChild(circle);
             circles.push(circle);
         }
     }
 
+    // Animate particles - continuous movement
+    function animateParticles() {
+        particleData.forEach((particle, index) => {
+            // Update angle for wobble effect
+            particle.angle += particle.wobbleSpeed;
+
+            // Move particle
+            particle.x += particle.speedX;
+            particle.y += particle.speedY;
+
+            // Add wobble
+            const wobbleX = Math.sin(particle.angle) * particle.wobbleAmount * 0.1;
+            const wobbleY = Math.cos(particle.angle * 0.7) * particle.wobbleAmount * 0.1;
+
+            // Wrap around screen edges
+            if (particle.x < -particle.size) {
+                particle.x = window.innerWidth + particle.size;
+            } else if (particle.x > window.innerWidth + particle.size) {
+                particle.x = -particle.size;
+            }
+
+            if (particle.y < -particle.size) {
+                particle.y = window.innerHeight + particle.size;
+            } else if (particle.y > window.innerHeight + particle.size) {
+                particle.y = -particle.size;
+            }
+
+            // Apply position
+            particle.element.style.left = `${particle.x + wobbleX}px`;
+            particle.element.style.top = `${particle.y + wobbleY}px`;
+        });
+
+        requestAnimationFrame(animateParticles);
+    }
+
     // Handle circle touch/click
-    function handleCircleTouch(e) {
+    function handleCircleTouch(e, index) {
         e.preventDefault();
+        e.stopPropagation();
+        
         const circle = e.target;
         circle.classList.add('touched');
 
@@ -60,18 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
             circle.classList.remove('touched');
         }, 600);
 
-        // Move circle to random position
-        const newX = Math.random() * (window.innerWidth - parseFloat(circle.style.width));
-        const newY = Math.random() * (window.innerHeight - parseFloat(circle.style.height));
-        
-        circle.style.transition = 'left 0.8s ease-out, top 0.8s ease-out';
-        circle.style.left = `${newX}px`;
-        circle.style.top = `${newY}px`;
+        // Give the particle a burst of speed in random direction
+        const particle = particleData[index];
+        particle.speedX = (Math.random() - 0.5) * 8;
+        particle.speedY = (Math.random() - 0.5) * 8;
 
-        // Reset transition after movement
+        // Gradually slow down
         setTimeout(() => {
-            circle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        }, 800);
+            particle.speedX = (Math.random() - 0.5) * 2;
+            particle.speedY = (Math.random() - 0.5) * 2;
+        }, 1000);
     }
 
     // Touch/Click ripple effect on background
@@ -110,82 +152,86 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Push circles away from touch point
     function pushCirclesAway(x, y) {
-        circles.forEach(circle => {
-            const rect = circle.getBoundingClientRect();
-            const circleX = rect.left + rect.width / 2;
-            const circleY = rect.top + rect.height / 2;
-
-            const dx = circleX - x;
-            const dy = circleY - y;
+        particleData.forEach((particle) => {
+            const dx = particle.x - x;
+            const dy = particle.y - y;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Only affect circles within 200px radius
-            if (distance < 200) {
-                const force = (200 - distance) / 200;
+            // Only affect circles within 150px radius
+            if (distance < 150) {
+                const force = (150 - distance) / 150;
                 const angle = Math.atan2(dy, dx);
-                const pushX = Math.cos(angle) * force * 100;
-                const pushY = Math.sin(angle) * force * 100;
+                
+                // Add burst velocity away from click point
+                particle.speedX += Math.cos(angle) * force * 5;
+                particle.speedY += Math.sin(angle) * force * 5;
 
-                const newX = Math.max(0, Math.min(window.innerWidth - rect.width, rect.left + pushX));
-                const newY = Math.max(0, Math.min(window.innerHeight - rect.height, rect.top + pushY));
-
-                circle.style.transition = 'left 0.5s ease-out, top 0.5s ease-out';
-                circle.style.left = `${newX}px`;
-                circle.style.top = `${newY}px`;
-
+                // Gradually return to normal speed
                 setTimeout(() => {
-                    circle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-                }, 500);
+                    particle.speedX = (Math.random() - 0.5) * 2;
+                    particle.speedY = (Math.random() - 0.5) * 2;
+                }, 1500);
             }
         });
     }
 
-    // Mouse move parallax effect
+    // Mouse move - particles slightly follow/react to mouse
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
 
     document.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
-    });
 
-    // Subtle parallax animation
-    function animateParallax() {
-        circles.forEach((circle, index) => {
-            const depth = (index % 3 + 1) * 0.01;
-            const moveX = (mouseX - window.innerWidth / 2) * depth;
-            const moveY = (mouseY - window.innerHeight / 2) * depth;
+        // Subtle attraction/repulsion for nearby particles
+        particleData.forEach((particle) => {
+            const dx = particle.x - mouseX;
+            const dy = particle.y - mouseY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-            const currentLeft = parseFloat(circle.style.left);
-            const currentTop = parseFloat(circle.style.top);
+            if (distance < 100) {
+                const force = (100 - distance) / 100 * 0.3;
+                const angle = Math.atan2(dy, dx);
+                
+                // Gentle push away from mouse
+                particle.speedX += Math.cos(angle) * force;
+                particle.speedY += Math.sin(angle) * force;
 
-            if (!circle.style.transition.includes('left')) {
-                circle.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                // Clamp speed
+                particle.speedX = Math.max(-4, Math.min(4, particle.speedX));
+                particle.speedY = Math.max(-4, Math.min(4, particle.speedY));
             }
         });
-
-        requestAnimationFrame(animateParallax);
-    }
+    });
 
     // Handle window resize
     window.addEventListener('resize', () => {
-        circles.forEach(circle => {
-            const currentLeft = parseFloat(circle.style.left);
-            const currentTop = parseFloat(circle.style.top);
-            const size = parseFloat(circle.style.width);
-
-            // Keep circles within bounds
-            if (currentLeft + size > window.innerWidth) {
-                circle.style.left = `${window.innerWidth - size}px`;
+        particleData.forEach(particle => {
+            // Keep particles within bounds
+            if (particle.x > window.innerWidth) {
+                particle.x = window.innerWidth - particle.size;
             }
-            if (currentTop + size > window.innerHeight) {
-                circle.style.top = `${window.innerHeight - size}px`;
+            if (particle.y > window.innerHeight) {
+                particle.y = window.innerHeight - particle.size;
             }
         });
     });
 
+    // Form submission handler
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // For now, just log - you can add actual authentication later
+            console.log('Login attempt:', { username, password });
+            alert('Login functionality will be implemented soon!');
+        });
+    }
+
     // Initialize
     createCircles();
-    animateParallax();
+    animateParticles();
 });
-
