@@ -1,11 +1,12 @@
 // ============================================
-// Floating Particles Animation with Touch Sensitivity
+// Glittery Floating Particles Animation with Touch Sensitivity
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
     const circlesContainer = document.getElementById('circlesContainer');
     const circles = [];
-    const numCircles = 50; // More particles
+    const numCircles = 50;
+    const numSparkles = 80; // Extra sparkle particles
 
     // Smaller particle sizes
     const minSize = 8;
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Store particle data for movement
     const particleData = [];
+    const sparkleData = [];
 
     // Create floating circles
     function createCircles() {
@@ -40,8 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 x: posX,
                 y: posY,
                 size: size,
-                speedX: (Math.random() - 0.5) * 2, // Random horizontal speed
-                speedY: (Math.random() - 0.5) * 2, // Random vertical speed
+                speedX: (Math.random() - 0.5) * 2,
+                speedY: (Math.random() - 0.5) * 2,
                 wobbleSpeed: Math.random() * 0.02 + 0.01,
                 wobbleAmount: Math.random() * 30 + 10,
                 angle: Math.random() * Math.PI * 2
@@ -56,17 +58,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Create glitter/sparkle particles
+    function createSparkles() {
+        for (let i = 0; i < numSparkles; i++) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+
+            // Random position
+            const posX = Math.random() * window.innerWidth;
+            const posY = Math.random() * window.innerHeight;
+            sparkle.style.left = `${posX}px`;
+            sparkle.style.top = `${posY}px`;
+
+            // Random animation delay for staggered twinkling
+            sparkle.style.animationDelay = `${Math.random() * 1.5}s`;
+            sparkle.style.animationDuration = `${Math.random() * 1 + 1}s`;
+
+            // Random size for variety
+            const size = Math.random() * 3 + 2;
+            sparkle.style.width = `${size}px`;
+            sparkle.style.height = `${size}px`;
+
+            // Store sparkle data
+            sparkleData.push({
+                element: sparkle,
+                x: posX,
+                y: posY,
+                speedX: (Math.random() - 0.5) * 0.5,
+                speedY: (Math.random() - 0.5) * 0.5,
+                twinkleTimer: Math.random() * 100
+            });
+
+            circlesContainer.appendChild(sparkle);
+        }
+    }
+
     // Animate particles - continuous movement
     function animateParticles() {
-        particleData.forEach((particle, index) => {
-            // Update angle for wobble effect
+        // Animate circles
+        particleData.forEach((particle) => {
             particle.angle += particle.wobbleSpeed;
 
-            // Move particle
             particle.x += particle.speedX;
             particle.y += particle.speedY;
 
-            // Add wobble
             const wobbleX = Math.sin(particle.angle) * particle.wobbleAmount * 0.1;
             const wobbleY = Math.cos(particle.angle * 0.7) * particle.wobbleAmount * 0.1;
 
@@ -83,12 +118,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 particle.y = -particle.size;
             }
 
-            // Apply position
             particle.element.style.left = `${particle.x + wobbleX}px`;
             particle.element.style.top = `${particle.y + wobbleY}px`;
         });
 
+        // Animate sparkles with slow drift
+        sparkleData.forEach((sparkle) => {
+            sparkle.x += sparkle.speedX;
+            sparkle.y += sparkle.speedY;
+
+            // Wrap around
+            if (sparkle.x < 0) sparkle.x = window.innerWidth;
+            if (sparkle.x > window.innerWidth) sparkle.x = 0;
+            if (sparkle.y < 0) sparkle.y = window.innerHeight;
+            if (sparkle.y > window.innerHeight) sparkle.y = 0;
+
+            sparkle.element.style.left = `${sparkle.x}px`;
+            sparkle.element.style.top = `${sparkle.y}px`;
+        });
+
         requestAnimationFrame(animateParticles);
+    }
+
+    // Randomly reposition sparkles for twinkling effect
+    function randomizeSparkles() {
+        setInterval(() => {
+            const randomIndex = Math.floor(Math.random() * sparkleData.length);
+            const sparkle = sparkleData[randomIndex];
+            
+            // Randomly move some sparkles to new positions
+            if (Math.random() > 0.5) {
+                sparkle.x = Math.random() * window.innerWidth;
+                sparkle.y = Math.random() * window.innerHeight;
+            }
+        }, 200);
     }
 
     // Handle circle touch/click
@@ -99,21 +162,48 @@ document.addEventListener('DOMContentLoaded', () => {
         const circle = e.target;
         circle.classList.add('touched');
 
-        // Remove the class after animation
         setTimeout(() => {
             circle.classList.remove('touched');
         }, 600);
 
-        // Give the particle a burst of speed in random direction
         const particle = particleData[index];
         particle.speedX = (Math.random() - 0.5) * 8;
         particle.speedY = (Math.random() - 0.5) * 8;
 
-        // Gradually slow down
+        // Create burst of sparkles at touch point
+        createSparkleBurst(particle.x, particle.y);
+
         setTimeout(() => {
             particle.speedX = (Math.random() - 0.5) * 2;
             particle.speedY = (Math.random() - 0.5) * 2;
         }, 1000);
+    }
+
+    // Create sparkle burst effect
+    function createSparkleBurst(x, y) {
+        for (let i = 0; i < 8; i++) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            sparkle.style.left = `${x}px`;
+            sparkle.style.top = `${y}px`;
+            sparkle.style.animationDuration = '0.8s';
+            
+            const angle = (Math.PI * 2 / 8) * i;
+            const distance = 50;
+            const endX = x + Math.cos(angle) * distance;
+            const endY = y + Math.sin(angle) * distance;
+            
+            sparkle.style.transition = 'all 0.5s ease-out';
+            circlesContainer.appendChild(sparkle);
+            
+            setTimeout(() => {
+                sparkle.style.left = `${endX}px`;
+                sparkle.style.top = `${endY}px`;
+                sparkle.style.opacity = '0';
+            }, 10);
+            
+            setTimeout(() => sparkle.remove(), 600);
+        }
     }
 
     // Touch/Click ripple effect on background
@@ -124,7 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ripple.style.top = `${y}px`;
         circlesContainer.appendChild(ripple);
 
-        // Remove ripple after animation
+        // Create sparkle burst too
+        createSparkleBurst(x, y);
+
         setTimeout(() => {
             ripple.remove();
         }, 1000);
@@ -132,11 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Background touch handler
     document.addEventListener('click', (e) => {
-        // Only create ripple if clicking on background, not on login box
         if (!e.target.closest('.login-box') && !e.target.classList.contains('circle')) {
             createRipple(e.clientX, e.clientY);
-            
-            // Push nearby circles away
             pushCirclesAway(e.clientX, e.clientY);
         }
     });
@@ -157,16 +246,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const dy = particle.y - y;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Only affect circles within 150px radius
             if (distance < 150) {
                 const force = (150 - distance) / 150;
                 const angle = Math.atan2(dy, dx);
                 
-                // Add burst velocity away from click point
                 particle.speedX += Math.cos(angle) * force * 5;
                 particle.speedY += Math.sin(angle) * force * 5;
 
-                // Gradually return to normal speed
                 setTimeout(() => {
                     particle.speedX = (Math.random() - 0.5) * 2;
                     particle.speedY = (Math.random() - 0.5) * 2;
@@ -175,15 +261,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Mouse move - particles slightly follow/react to mouse
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-
+    // Mouse move - particles react to mouse
     document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
 
-        // Subtle attraction/repulsion for nearby particles
         particleData.forEach((particle) => {
             const dx = particle.x - mouseX;
             const dy = particle.y - mouseY;
@@ -193,11 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const force = (100 - distance) / 100 * 0.3;
                 const angle = Math.atan2(dy, dx);
                 
-                // Gentle push away from mouse
                 particle.speedX += Math.cos(angle) * force;
                 particle.speedY += Math.sin(angle) * force;
 
-                // Clamp speed
                 particle.speedX = Math.max(-4, Math.min(4, particle.speedX));
                 particle.speedY = Math.max(-4, Math.min(4, particle.speedY));
             }
@@ -207,7 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle window resize
     window.addEventListener('resize', () => {
         particleData.forEach(particle => {
-            // Keep particles within bounds
             if (particle.x > window.innerWidth) {
                 particle.x = window.innerWidth - particle.size;
             }
@@ -215,23 +294,87 @@ document.addEventListener('DOMContentLoaded', () => {
                 particle.y = window.innerHeight - particle.size;
             }
         });
+
+        sparkleData.forEach(sparkle => {
+            if (sparkle.x > window.innerWidth) sparkle.x = window.innerWidth;
+            if (sparkle.y > window.innerHeight) sparkle.y = window.innerHeight;
+        });
     });
 
-    // Form submission handler
+    // Form submission handler with hardcoded credentials (for testing)
+    // TODO: Replace with database authentication later
+    const VALID_USERNAME = 'admin';
+    const VALID_PASSWORD = 'admin123';
+
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             
-            // For now, just log - you can add actual authentication later
-            console.log('Login attempt:', { username, password });
-            alert('Login functionality will be implemented soon!');
+            // Validate credentials
+            if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                // Store login state in session
+                sessionStorage.setItem('loggedIn', 'true');
+                sessionStorage.setItem('username', username);
+                
+                // Redirect to profile page
+                window.location.href = 'profile.html';
+            } else {
+                // Show error message
+                showLoginError('Invalid username or password!');
+            }
         });
+    }
+
+    // Function to show login error
+    function showLoginError(message) {
+        // Remove existing error if any
+        const existingError = document.querySelector('.login-error');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // Create error element
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'login-error';
+        errorDiv.textContent = message;
+        errorDiv.style.cssText = `
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            border: 1px solid #ffcdd2;
+            animation: shake 0.5s ease;
+        `;
+
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-5px); }
+                40%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Insert error before form
+        const form = document.getElementById('loginForm');
+        form.parentNode.insertBefore(errorDiv, form);
+
+        // Remove error after 3 seconds
+        setTimeout(() => {
+            errorDiv.remove();
+        }, 3000);
     }
 
     // Initialize
     createCircles();
+    createSparkles();
     animateParticles();
+    randomizeSparkles();
 });

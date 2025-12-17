@@ -11,7 +11,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Animated Gradient Background - Brighter Light Blue */
+/* Animated Glittery Gradient Background */
 .background {
     position: fixed;
     top: 0;
@@ -20,15 +20,16 @@ body {
     height: 100%;
     background: linear-gradient(
         135deg,
-        #e8f8ff 0%,
-        #d4f1ff 25%,
-        #bde9ff 50%,
-        #a8e2ff 75%,
-        #94dbff 100%
+        #e8f4ff 0%,
+        #c5e3ff 20%,
+        #a8d4ff 40%,
+        #8ec5ff 60%,
+        #74b6ff 80%,
+        #5aa7ff 100%
     );
     background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
-    z-index: -2;
+    animation: gradientShift 12s ease infinite;
+    z-index: -3;
 }
 
 /* Gradient Animation */
@@ -44,19 +45,128 @@ body {
     }
 }
 
-/* Gradient Overlay for depth */
+/* Glitter Overlay Layer 1 */
 .gradient-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(
-        ellipse at center,
-        rgba(255, 255, 255, 0.4) 0%,
-        transparent 70%
-    );
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,1), transparent),
+        radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(2px 2px at 200px 50px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 250px 160px, rgba(255,255,255,1), transparent),
+        radial-gradient(2px 2px at 300px 90px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 350px 200px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(2px 2px at 400px 130px, rgba(255,255,255,0.8), transparent);
+    background-size: 400px 300px;
+    animation: glitterShift1 4s linear infinite;
+    z-index: -2;
+}
+
+/* Glitter Overlay Layer 2 */
+.background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(1px 1px at 50px 100px, rgba(255,255,255,1), transparent),
+        radial-gradient(2px 2px at 100px 150px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 150px 50px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(2px 2px at 220px 180px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 280px 70px, rgba(255,255,255,1), transparent),
+        radial-gradient(2px 2px at 340px 220px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 380px 120px, rgba(255,255,255,0.9), transparent),
+        radial-gradient(2px 2px at 420px 250px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 480px 80px, rgba(255,255,255,1), transparent),
+        radial-gradient(2px 2px at 520px 190px, rgba(255,255,255,0.8), transparent);
+    background-size: 500px 350px;
+    animation: glitterShift2 6s linear infinite;
     z-index: -1;
+}
+
+/* Glitter Overlay Layer 3 - Larger sparkles */
+.background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(3px 3px at 80px 60px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 180px 200px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(3px 3px at 320px 100px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 450px 280px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(3px 3px at 550px 150px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 620px 320px, rgba(255,255,255,0.5), transparent);
+    background-size: 700px 400px;
+    animation: glitterShift3 8s linear infinite reverse;
+    z-index: -1;
+}
+
+/* Glitter Animations */
+@keyframes glitterShift1 {
+    0% {
+        background-position: 0 0;
+        opacity: 0.8;
+    }
+    25% {
+        opacity: 1;
+    }
+    50% {
+        background-position: 400px 300px;
+        opacity: 0.8;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        background-position: 0 0;
+        opacity: 0.8;
+    }
+}
+
+@keyframes glitterShift2 {
+    0% {
+        background-position: 0 0;
+        opacity: 0.7;
+    }
+    33% {
+        opacity: 1;
+    }
+    50% {
+        background-position: -500px 350px;
+    }
+    66% {
+        opacity: 0.9;
+    }
+    100% {
+        background-position: 0 0;
+        opacity: 0.7;
+    }
+}
+
+@keyframes glitterShift3 {
+    0% {
+        background-position: 0 0;
+        opacity: 0.6;
+    }
+    50% {
+        background-position: 700px -400px;
+        opacity: 1;
+    }
+    100% {
+        background-position: 0 0;
+        opacity: 0.6;
+    }
 }
 
 /* Circles Container */
@@ -77,13 +187,13 @@ body {
     border-radius: 50%;
     background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.7) 0%,
-        rgba(255, 255, 255, 0.3) 100%
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.4) 100%
     );
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow: 
-        0 4px 15px rgba(100, 180, 255, 0.2),
-        inset 0 0 10px rgba(255, 255, 255, 0.3);
+        0 4px 15px rgba(100, 180, 255, 0.3),
+        inset 0 0 10px rgba(255, 255, 255, 0.4);
     transition: transform 0.3s ease, opacity 0.3s ease;
     pointer-events: auto;
     cursor: pointer;
@@ -93,8 +203,8 @@ body {
 .circle:hover {
     transform: scale(1.3);
     box-shadow: 
-        0 6px 20px rgba(100, 180, 255, 0.3),
-        inset 0 0 15px rgba(255, 255, 255, 0.5);
+        0 6px 20px rgba(100, 180, 255, 0.4),
+        inset 0 0 15px rgba(255, 255, 255, 0.6);
 }
 
 /* Circle touch/click effect */
@@ -114,6 +224,31 @@ body {
     100% {
         transform: scale(1);
         opacity: 1;
+    }
+}
+
+/* Sparkle particle */
+.sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sparkleAnim 1.5s ease-in-out infinite;
+    box-shadow: 
+        0 0 6px 2px rgba(255, 255, 255, 0.8),
+        0 0 12px 4px rgba(150, 200, 255, 0.5);
+}
+
+@keyframes sparkleAnim {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1);
     }
 }
 
@@ -255,7 +390,7 @@ body {
     border-radius: 50%;
     background: radial-gradient(
         circle,
-        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.9) 0%,
         rgba(255, 255, 255, 0) 70%
     );
     pointer-events: none;
