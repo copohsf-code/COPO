@@ -181,6 +181,49 @@ class DataManager {
         return data.themes;
     }
 
+    // ===============================
+    // Students
+    // ===============================
+
+    // Add a new student
+    async addStudent(student) {
+        const data = await this.loadData();
+        if (!Array.isArray(data.students)) {
+            data.students = [];
+        }
+
+        const studentWithMeta = {
+            id: `STU-${Date.now()}`,
+            createdAt: new Date().toISOString(),
+            ...student
+        };
+
+        data.students.push(studentWithMeta);
+        await this.saveData(data);
+        return studentWithMeta;
+    }
+
+    // ===============================
+    // Faculty
+    // ===============================
+
+    async addFaculty(faculty) {
+        const data = await this.loadData();
+        if (!Array.isArray(data.faculty)) {
+            data.faculty = [];
+        }
+
+        const facultyWithMeta = {
+            id: `FAC-${Date.now()}`,
+            createdAt: new Date().toISOString(),
+            ...faculty
+        };
+
+        data.faculty.push(facultyWithMeta);
+        await this.saveData(data);
+        return facultyWithMeta;
+    }
+
     // Initialize data from localStorage if available
     initFromLocalStorage() {
         const stored = localStorage.getItem('appData');

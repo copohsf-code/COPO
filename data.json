@@ -17,8 +17,58 @@
       "lastLogin": ""
     }
   ],
-  "students": [],
-  "faculty": [],
+  "students": [
+    {
+      "id": "STU-1726800000001",
+      "applicationFormNo": "MU5365401587",
+      "name": "XYZ",
+      "enrUom": "MU034112054511210",
+      "gender": "Male",
+      "rollNo": "01",
+      "academicYear": "2025-26",
+      "department": "BSC IT",
+      "className": "SY",
+      "division": "A",
+      "phoneNo": "+91 9876543210",
+      "email": "xyz@gmail.com",
+      "createdAt": "2025-01-01T10:00:00.000Z"
+    },
+    {
+      "id": "STU-1726800000002",
+      "applicationFormNo": "MU5365402000",
+      "name": "ABC",
+      "enrUom": "MU034112054511211",
+      "gender": "Female",
+      "rollNo": "02",
+      "academicYear": "2025-26",
+      "department": "BSC IT",
+      "className": "SY",
+      "division": "A",
+      "phoneNo": "+91 9123456780",
+      "email": "abc@example.com",
+      "createdAt": "2025-01-02T11:30:00.000Z"
+    }
+  ],
+  "faculty": [
+    {
+      "id": "FAC-1726800000101",
+      "facultyId": "FAC001",
+      "facultyName": "John Doe",
+      "designation": "Assistant Professor",
+      "email": "john.doe@college.edu",
+      "phoneNo": "+91 9000000001",
+      "createdAt": "2025-01-03T09:15:00.000Z"
+    },
+    {
+      "id": "FAC-1726800000102",
+      "facultyId": "FAC002",
+      "facultyName": "Jane Smith",
+      "designation": "Associate Professor",
+      "email": "jane.smith@college.edu",
+      "phoneNo": "+91 9000000002",
+      "createdAt": "2025-01-03T10:45:00.000Z"
+    }
+  ],
   "subjects": [],
   "co": [],
   "po": [],
