@@ -301,29 +301,65 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Form submission handler with hardcoded credentials (for testing)
-    // TODO: Replace with database authentication later
-    const VALID_USERNAME = 'admin';
-    const VALID_PASSWORD = 'admin123';
-
+    // Form submission handler with data manager
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             
-            // Validate credentials
-            if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-                // Store login state in session
-                sessionStorage.setItem('loggedIn', 'true');
-                sessionStorage.setItem('username', username);
+            // Load data manager
+            if (typeof dataManager === 'undefined') {
+                // Fallback to hardcoded credentials if dataManager not loaded
+                const VALID_USERNAME = 'admin';
+                const VALID_PASSWORD = 'admin123';
                 
-                // Redirect to profile page
-                window.location.href = 'profile.html';
-            } else {
-                // Show error message
-                showLoginError('Invalid username or password!');
+                if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                    sessionStorage.setItem('loggedIn', 'true');
+                    sessionStorage.setItem('username', username);
+                    window.location.href = 'profile.html';
+                } else {
+                    showLoginError('Invalid username or password!');
+                }
+                return;
+            }
+            
+            try {
+                // Load data and validate user
+                const data = await dataManager.loadData();
+                const user = data.users.find(u => u.username === username && u.password === password);
+                
+                if (user) {
+                    // Update last login
+                    await dataManager.updateUser(username, { 
+                        lastLogin: new Date().toISOString() 
+                    });
+                    
+                    // Store login state in session
+                    sessionStorage.setItem('loggedIn', 'true');
+                    sessionStorage.setItem('username', username);
+                    sessionStorage.setItem('userRole', user.role || 'admin');
+                    
+                    // Redirect to profile page
+                    window.location.href = 'profile.html';
+                } else {
+                    // Show error message
+                    showLoginError('Invalid username or password!');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                // Fallback to hardcoded credentials
+                const VALID_USERNAME = 'admin';
+                const VALID_PASSWORD = 'admin123';
+                
+                if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                    sessionStorage.setItem('loggedIn', 'true');
+                    sessionStorage.setItem('username', username);
+                    window.location.href = 'profile.html';
+                } else {
+                    showLoginError('Invalid username or password!');
+                }
             }
         });
     }
