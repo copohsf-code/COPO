@@ -15,11 +15,7 @@
                 <div class="theme-selector">
                     <label for="themeSelect">Theme:</label>
                     <select id="themeSelect" class="theme-select">
-                        <option value="default">Default Blue</option>
-                        <option value="green">Green</option>
-                        <option value="purple">Purple</option>
-                        <option value="orange">Orange</option>
-                        <option value="teal">Teal</option>
+                        <!-- Options will be populated dynamically based on user role -->
                     </select>
                 </div>
             </li>
@@ -51,8 +47,8 @@
             <div class="content-section">
                 <div class="welcome-section">
                     <span class="success-badge">✓ Login Successful</span>
-                    <h1>Welcome, Admin</h1>
-                    <p>You are now logged in as Administrator.</p>
+                    <h1 id="welcomeTitle">Welcome</h1>
+                    <p id="welcomeRole">You are now logged in.</p>
                     <p class="info-text">Select an option from the sidebar to get started.</p>
                     <p class="under-construction">This page is under construction.</p>
                 </div>

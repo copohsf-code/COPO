@@ -44,6 +44,26 @@ body {
     transition: color 0.3s ease;
 }
 
+/* Superroot theme specific adjustments */
+body[data-theme="superroot"] .navbar-brand,
+body[data-theme="superroot"] .nav-link {
+    color: var(--secondary-color) !important;
+}
+
+body[data-theme="superroot"] .theme-selector label {
+    color: var(--secondary-color) !important;
+}
+
+body[data-theme="superroot"] .sidebar-item {
+    color: var(--secondary-color) !important;
+}
+
+body[data-theme="superroot"] .sidebar-item:hover,
+body[data-theme="superroot"] .sidebar-item.active {
+    background: rgba(173, 239, 209, 0.2);
+    color: var(--secondary-color) !important;
+}
+
 .navbar-nav {
     display: flex;
     align-items: center;

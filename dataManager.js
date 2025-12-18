@@ -73,6 +73,14 @@ class DataManager {
                     theme: "default",
                     createdAt: new Date().toISOString(),
                     lastLogin: ""
+                },
+                {
+                    username: "superroot",
+                    password: "superroot123",
+                    role: "superroot",
+                    theme: "superroot",
+                    createdAt: new Date().toISOString(),
+                    lastLogin: ""
                 }
             ],
             students: [],
@@ -124,6 +132,14 @@ class DataManager {
                     navbar: "linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 50%, #80cbc4 100%)",
                     sidebar: "linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 50%, #80cbc4 100%)",
                     accent: "#004d40"
+                },
+                superroot: {
+                    name: "Superroot Exclusive",
+                    primary: "#00203F",
+                    secondary: "#ADEFD1",
+                    navbar: "linear-gradient(135deg, #00203F 0%, #003d5c 50%, #004d6b 100%)",
+                    sidebar: "linear-gradient(135deg, #00203F 0%, #003d5c 50%, #004d6b 100%)",
+                    accent: "#ADEFD1"
                 }
             }
         };

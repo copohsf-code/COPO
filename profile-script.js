@@ -15,15 +15,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize data manager
     await dataManager.loadData();
     
+    // Get user role
+    const user = await dataManager.getUser(username);
+    const userRole = user ? user.role : 'admin';
+    sessionStorage.setItem('userRole', userRole);
+    
+    // Update welcome message based on role
+    updateWelcomeMessage(userRole, username);
+    
     // Load user's theme preference
     await loadUserTheme(username);
     
-    // Setup theme selector
-    setupThemeSelector(username);
+    // Setup theme selector (with role-based filtering)
+    setupThemeSelector(username, userRole);
     
     // Setup sidebar navigation
     setupSidebarNavigation();
 });
+
+// Update welcome message based on user role
+function updateWelcomeMessage(userRole, username) {
+    const welcomeTitle = document.getElementById('welcomeTitle');
+    const welcomeRole = document.getElementById('welcomeRole');
+    
+    if (welcomeTitle && welcomeRole) {
+        const roleNames = {
+            'superroot': 'Superroot',
+            'admin': 'Administrator',
+            'faculty': 'Faculty Member',
+            'student': 'Student'
+        };
+        
+        const roleName = roleNames[userRole] || 'User';
+        welcomeTitle.textContent = `Welcome, ${roleName}`;
+        welcomeRole.textContent = `You are now logged in as ${roleName}.`;
+    }
+}
 
 // Load user's saved theme
 async function loadUserTheme(username) {
@@ -56,6 +83,9 @@ async function applyTheme(themeName) {
         document.documentElement.style.setProperty('--sidebar-gradient', theme.sidebar);
         document.documentElement.style.setProperty('--accent-color', theme.accent);
 
+        // Set data attribute for theme-specific styling
+        document.body.setAttribute('data-theme', themeName);
+
         // Store current theme in session
         sessionStorage.setItem('currentTheme', themeName);
     } catch (error) {
@@ -63,13 +93,45 @@ async function applyTheme(themeName) {
     }
 }
 
-// Setup theme selector
-function setupThemeSelector(username) {
+// Setup theme selector with role-based filtering
+async function setupThemeSelector(username, userRole) {
     const themeSelect = document.getElementById('themeSelect');
     if (!themeSelect) return;
 
+    // Get all available themes
+    const allThemes = await dataManager.getAllThemes();
+    
+    // Clear existing options
+    themeSelect.innerHTML = '';
+    
+    // Add themes based on user role
+    for (const [key, theme] of Object.entries(allThemes)) {
+        // Only show superroot theme to superroot users
+        if (key === 'superroot' && userRole !== 'superroot') {
+            continue;
+        }
+        
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = theme.name;
+        themeSelect.appendChild(option);
+    }
+    
+    // Set current user's theme
+    const user = await dataManager.getUser(username);
+    if (user && user.theme) {
+        themeSelect.value = user.theme;
+    }
+
     themeSelect.addEventListener('change', async (e) => {
         const selectedTheme = e.target.value;
+        
+        // Prevent non-superroot users from selecting superroot theme
+        if (selectedTheme === 'superroot' && userRole !== 'superroot') {
+            themeSelect.value = user.theme || 'default';
+            showNotification('Access denied: This theme is exclusive to superroot users', 'error');
+            return;
+        }
         
         // Apply theme immediately
         await applyTheme(selectedTheme);
