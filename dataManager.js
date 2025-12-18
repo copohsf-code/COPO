@@ -8,26 +8,18 @@ class DataManager {
         this.data = null;
     }
 
-    // Load data from JSON file or localStorage
+    // Load data from JSON file
     async loadData() {
-        // First try localStorage (for browser compatibility)
-        const stored = localStorage.getItem('appData');
-        if (stored) {
-            try {
-                this.data = JSON.parse(stored);
-                return this.data;
-            } catch (error) {
-                console.error('Error parsing stored data:', error);
-            }
+        // If already loaded once, reuse in-memory data
+        if (this.data) {
+            return this.data;
         }
-        
-        // Then try JSON file
+
+        // Try JSON file
         try {
             const response = await fetch(this.dataFile);
             if (response.ok) {
                 this.data = await response.json();
-                // Also store in localStorage for future use
-                localStorage.setItem('appData', JSON.stringify(this.data));
                 return this.data;
             }
         } catch (error) {
@@ -37,24 +29,15 @@ class DataManager {
         // Return default structure if nothing found
         const defaultData = this.getDefaultData();
         this.data = defaultData;
-        localStorage.setItem('appData', JSON.stringify(defaultData));
         return defaultData;
     }
 
-    // Save data to JSON file (Note: In browser, we'll use localStorage as fallback)
+    // Save data (in-memory only on frontend; actual JSON write will be done by backend later)
     async saveData(data) {
         try {
             this.data = data;
-            // Store in localStorage as fallback (will be replaced with backend API later)
-            localStorage.setItem('appData', JSON.stringify(data));
-            
-            // In production, this would be an API call:
-            // await fetch('/api/save-data', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify(data)
-            // });
-            
+            // NOTE: Frontend JavaScript in the browser cannot write directly to data.json.
+            // When backend is added, replace this with an API that persists to JSON/DB.
             return true;
         } catch (error) {
             console.error('Error saving data:', error);
@@ -224,26 +207,8 @@ class DataManager {
         return facultyWithMeta;
     }
 
-    // Initialize data from localStorage if available
-    initFromLocalStorage() {
-        const stored = localStorage.getItem('appData');
-        if (stored) {
-            try {
-                this.data = JSON.parse(stored);
-                return this.data;
-            } catch (error) {
-                console.error('Error parsing stored data:', error);
-            }
-        }
-        return null;
-    }
 }
 
 // Create global instance
 const dataManager = new DataManager();
-
-// Initialize data on load (for immediate access)
-dataManager.loadData().catch(err => {
-    console.log('Initial data load:', err);
-});
 
